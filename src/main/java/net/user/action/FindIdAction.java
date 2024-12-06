@@ -20,7 +20,10 @@ public class FindIdAction implements Action {
         UserDAO userDAO = new UserDAO();
         String id = userDAO.findId(userEmail, birthDate);
         
-        request.setAttribute("userId", id);
+        request.getSession().setAttribute("userId", id);
+        
+        System.out.println("id : " + id);
+        System.out.println("request : " + request.getAttribute("userId"));
         
 		// 아이디 찾기 성공 여부에 따른 처리
 		ActionForward forward = new ActionForward();
