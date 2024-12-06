@@ -1,7 +1,7 @@
-#BitBank Project
-##학원 : 비트교육센터 (https://www.bitacademy.com/)
-##D-day : 2024-11-11 ~ 2024-12-13
-##Team : 김진우(Leader), 이재하(Deputy Leader), 정원담, 이승민
+# BitBank Project
+## 학원 : 비트교육센터 (https://www.bitacademy.com/)
+## D-day : 2024-11-11 ~ 2024-12-13
+## Team : 김진우(Leader), 이재하(Deputy Leader), 정원담, 이승민
 
 
 ## 주요 기능
