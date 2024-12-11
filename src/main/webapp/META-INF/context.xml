@@ -1,0 +1,13 @@
+<!-- Connection Pool 설정 -->
+<context>
+	<Resource name="jdbc/MysqlDB"
+	auth="Container"
+	type="javax.sql.DataSource"
+	driverClassName="com.mysql.jdbc.Driver"
+	url="jdbc:mysql://localhost:3306/bitbank?serverTimezone=UTC"
+	username="root"
+	password="1234"
+	maxActive="20"
+	maxIdle="10"
+	maxWait="-1" />
+</context>
