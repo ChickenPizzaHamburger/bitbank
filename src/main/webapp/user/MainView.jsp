@@ -60,7 +60,7 @@
 	<%
 	// 로그인 상태 확인
 	String userId = (String) session.getAttribute("userId");
-	String baseURL = "http://192.168.0.202:8080/BitBank(1213ver1)";
+	String baseURL = "http://localhost:8080/BitBank";
 	String targetPage = userId != null ? baseURL + "/accountView.ac" : baseURL + "/loginView.use";
 	%>
 
