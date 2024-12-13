@@ -28,10 +28,10 @@
         			<input type="radio" name="login_type" value="social" id="login-social" onclick="toggleLoginForm('social')">
         			<label for="login-social" class="radio-label">소셜</label>
     			</div>
-    			<div class="login-option">
+    			<!-- <div class="login-option">
         			<input type="radio" name="login_type" value="qr" id="login-qr" onclick="toggleLoginForm('qr')">
        				<label for="login-qr" class="radio-label">QR</label>
-    			</div>
+    			</div> -->
 			</section>
 
             <!-- 일반 로그인 폼 -->
@@ -63,10 +63,10 @@
 			</section>
 
 			<!-- QR 로그인 -->
-            <section id="qr-login" class="login-section" style="display: none;">
+            <!-- <section id="qr-login" class="login-section" style="display: none;">
                 <p>QR 코드를 스캔하여 로그인하세요.</p>
                 <img src="qr-placeholder.png" alt="QR 코드" style="max-width: 100px; margin-top: 10px;">
-            </section>
+            </section> -->
 
             <!-- 항상 표시되는 링크 -->
             <footer id="login-links" class="form-footer">

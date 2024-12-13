@@ -23,12 +23,12 @@
 			</div>
 		</div>
 
-		<!-- 관리자 링크 -->
+		<%-- <!-- 관리자 링크 -->
         <c:if test="${sessionScope.user.role == 'ADMIN'}">
             <div class="mb-3">
                 <a href="userListAction.use" class="btn btn-primary">유저 리스트 보기</a>
             </div>
-        </c:if>
+        </c:if> --%>
 
 		<!-- 계좌 정보 -->
 		<c:forEach var="account" items="${accountList}">
@@ -48,7 +48,7 @@
 						<!-- 계좌정보 버튼 -->
 						<button class="btn btn-secondary px-4 py-2 rounded-3" onclick="location.href = './accountInfoAction.ac?accountNum=${account.account_num}'">계좌 내역</button>
 						<!-- 락 설정 버튼 -->
-						<button class="btn btn-warning px-4 py-2 rounded-3" onclick="location.href = './lock.loc?action=settings&account_num=${account.account_num}'">락 설정</button>
+						<button class="btn btn-warning px-4 py-2 rounded-3" onclick="location.href = './lock?action=settings&account_num=${account.account_num}'">락 설정</button>
 					</div>
 				</div>
 			</div>

@@ -38,7 +38,7 @@ public class SocialSignupAction implements Action { // 소셜 회원가입 및 �
         String grantType = "authorization_code"; // 고정값
         String clientId = "8a86fb5c9d3a0b098175c975919ec566"; // 앱 REST API 키
         String clientSecret = "Nz3axD0m8YeVvsny72hrem0b3N5O0kX1"; // 클라이언트 시크릿
-        String redirectUri = "http://localhost:8080/BitBank/socialSignupAction.use"; // 리다이렉트 URI (IP주소)
+        String redirectUri = "http://192.168.0.202:8080/BitBank/socialSignupAction.use"; // 리다이렉트 URI (IP주소)
 
         // 카카오 토큰 발급 API 호출 URL
         String tokenUrl = "https://kauth.kakao.com/oauth/token";

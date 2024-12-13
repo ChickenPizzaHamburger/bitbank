@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html lang="ko">
 
@@ -60,7 +61,7 @@
 	<%
 	// 로그인 상태 확인
 	String userId = (String) session.getAttribute("userId");
-	String baseURL = "http://localhost:8080/BitBank";
+	String baseURL = "http://192.168.0.202:8080/BitBank";
 	String targetPage = userId != null ? baseURL + "/accountView.ac" : baseURL + "/loginView.use";
 	%>
 
@@ -74,6 +75,7 @@
             const introduceBtn = document.getElementById("introduce-btn");            
             const accountaddBtn = document.getElementById("accountadd-btn");
             const sendlistBtn = document.getElementById("sendlist-btn");
+           /*  const lockloanBtn = document.getElementById("lockloan-btn");             */
             const iframe = document.querySelector("iframe[name='contentFrame']");
 
             //login 버튼을 눌렀을 때 동작
@@ -115,11 +117,20 @@
             	if (!isLoggedIn) {
                     alert("로그인 후 이용해 주세요");
                 } else {
-                	 const newTargetPage = "<%=baseURL%>/accountAddView.ac"; // 전체송금내역 페이지 URL
+                	 const newTargetPage = "<%=baseURL%>/accountInfoView.ac"; // 전체송금내역 페이지 URL
                 	 iframe.src = newTargetPage; // iframe src를 업데이트
                 }
             });
             
+         <%--  //전체 Lock 대출 눌렀을 때
+            lockloanBtn.addEventListener("click", () => {
+            	if (!isLoggedIn) {
+                    alert("로그인 후 이용해 주세요");
+                } else {
+                	 const newTargetPage = "<%=baseURL%>/lock.loc?action=settings"; // Lock 대출 페이지 URL
+                	 iframe.src = newTargetPage; // iframe src를 업데이트
+                }
+            }); --%>
         });
     </script>
 
@@ -145,10 +156,15 @@
 								id="accountadd-btn">계좌개설</button></li>
 						<li class="nav-item"><button class="btn btn-primary me-2"
 								id="sendlist-btn">전체송금내역</button></li>
-						<li class="nav-item"><button class="btn btn-primary me-2"
-								id="accountadd-btn">일반통장</button></li>
-						<li class="nav-item"><button class="btn btn-primary me-2"
-								id="accountadd-btn">Lock대출</button></li>
+						<!-- <li class="nav-item"><button class="btn btn-primary me-2"
+								id="accountadd-btn">일반통장</button></li> -->
+						<!-- <li class="nav-item"><button class="btn btn-primary me-2"
+								id="accountadd-btn">Lock대출</button></li> 	 -->
+						<c:if
+							test="${sessionScope.user != null && sessionScope.user.role == 'ADMIN'}">
+							<li class="nav-item"><a href="userListAction.use"
+								class="btn btn-primary me-2">유저 리스트 보기</a></li>
+						</c:if>
 					</ul>
 					<div>
 						<button class="btn btn-light me-2" id="login-btn"
@@ -180,7 +196,8 @@
 				<div class="col-md-4">
 					<div class="card align-items-center mb-4">
 						<div class="container-fluid" style="height: 48vh;">
-							<main class="container-fluid p-0" style="height: 100%; width: 100%;">
+							<main class="container-fluid p-0"
+								style="height: 100%; width: 100%;">
 								<iframe src="<%=targetPage%>" class="w-100 h-100 border-0"
 									name="contentFrame"> </iframe>
 							</main>
