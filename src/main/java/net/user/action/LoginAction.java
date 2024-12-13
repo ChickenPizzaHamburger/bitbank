@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.user.db.UserDAO;
+import net.user.db.UserBean;
 import net.util.Action;
 import net.util.ActionForward;
 
@@ -39,21 +40,26 @@ public class LoginAction implements Action { // 로그인 시도
 
         if (isValidUser) {
             // 로그인 성공 시 세션에 사용자 정보 저장
+            UserBean user = userDAO.getUserById(userId); // 사용자 정보 조회
             request.getSession().setAttribute("userId", userId);
+            request.getSession().setAttribute("userRole", user.getRole().name()); // 사용자 역할 저장
+            request.getSession().setAttribute("user", user);
+            
+            System.out.println("role : " + user.getRole().name());
 
             // 성공 후 리다이렉션 (예: 홈 페이지로 이동)
-            forward.setPath("/accountAction.ac");
+            forward.setPath("./accountAction.ac");
             forward.setRedirect(true);
         } else {
             // 로그인 실패 시 에러 메시지 설정
             String errorMessage = isSocialLogin
                     ? "소셜 로그인에 실패했습니다. 다시 시도해주세요."
                     : "아이디나 비밀번호가 틀렸습니다.";
-            request.setAttribute("errorMessage", errorMessage);
+            request.getSession().setAttribute("errorMessage", errorMessage);
 
-            // 로그인 페이지로 포워딩
-            forward.setPath("/loginView.use");
-            forward.setRedirect(false); // 포워드로 이동
+            // 로그인 페이지로 리다이렉트
+            forward.setPath("./index.use");
+            forward.setRedirect(true); // 리다이렉트로 이동
         }
 
         return forward;

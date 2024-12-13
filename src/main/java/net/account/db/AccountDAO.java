@@ -182,4 +182,18 @@ public class AccountDAO {
 
         return accountList;
     }
+    
+    public void deactivateAccount(String accountNum) {
+        // 계좌 비밀번호를 null로 설정하여 계좌 비활성화
+        String sql = "UPDATE accounts SET password = NULL WHERE account_num = ?";
+        
+        try (Connection con = ds.getConnection();
+                PreparedStatement pstmt = con.prepareStatement(sql)) {
+            
+            pstmt.setString(1, accountNum);
+            pstmt.executeUpdate();
+        } catch (Exception e) {
+            System.err.println("계좌 비활성화 실패 : " + e);
+        }
+    }
 }

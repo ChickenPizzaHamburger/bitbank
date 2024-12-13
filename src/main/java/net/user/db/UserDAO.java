@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -218,5 +221,165 @@ public class UserDAO {
         }
 
         return username;
+    }
+    
+    // 사용자 정보 조회 메서드
+    public UserBean getUserById(String userId) {
+        String sql = "SELECT userId, username, email, birthDate, gender, role, createdAt FROM user WHERE userId =?";
+        UserBean user = null;
+
+        try (Connection con = ds.getConnection(); PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setString(1, userId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    user = new UserBean();
+                    user.setUserId(rs.getString("userId"));
+                    user.setUsername(rs.getString("username"));
+                    user.setEmail(rs.getString("email"));
+                    user.setBirthDate(rs.getDate("birthDate").toLocalDate());
+                    user.setGender(UserBean.Gender.valueOf(rs.getString("gender")));
+                    user.setRole(UserBean.Role.valueOf(rs.getString("role")));
+                    user.setCreatedAt(rs.getTimestamp("createdAt").toLocalDateTime());
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("사용자 정보 조회 실패 : " + e);
+        }
+
+        return user;
+    }
+    
+    // Admin Page
+    // 유저 리스트 가져오기 (페이징 및 검색 기능 포함)
+    public List<UserBean> getUserList(int startRow, int limit, String searchKeyword, String joinDate) {
+        List<UserBean> userList = new ArrayList<>();
+        String sql = "SELECT userId, username, email, birthDate, gender, role, createdAt FROM user WHERE role != 'ROOT'";
+
+        // Convert searchKeyword for gender if applicable
+        if ("남성".equals(searchKeyword)) {
+            searchKeyword = "MALE";
+        } else if ("여성".equals(searchKeyword)) {
+            searchKeyword = "FEMALE";
+        } else if ("선택안함".equals(searchKeyword)) {
+            searchKeyword = "ANONY";
+        }
+
+        if (searchKeyword != null && !searchKeyword.isEmpty()) {
+            sql += " AND (userId LIKE ? OR username LIKE ? OR email LIKE ? OR gender LIKE ?)";
+        }
+
+        if (joinDate != null && !joinDate.isEmpty()) {
+            sql += " AND DATE(createdAt) = ?";
+        }
+
+        sql += " ORDER BY createdAt DESC LIMIT ?, ?";
+
+        try (Connection con = ds.getConnection(); PreparedStatement pstmt = con.prepareStatement(sql)) {
+            int paramIndex = 1;
+
+            if (searchKeyword != null && !searchKeyword.isEmpty()) {
+                pstmt.setString(paramIndex++, "%" + searchKeyword + "%");
+                pstmt.setString(paramIndex++, "%" + searchKeyword + "%");
+                pstmt.setString(paramIndex++, "%" + searchKeyword + "%");
+                pstmt.setString(paramIndex++, "%" + searchKeyword + "%");
+            }
+
+            if (joinDate != null && !joinDate.isEmpty()) {
+                pstmt.setString(paramIndex++, joinDate);
+            }
+
+            pstmt.setInt(paramIndex++, startRow);
+            pstmt.setInt(paramIndex, limit);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    UserBean user = new UserBean();
+                    user.setUserId(rs.getString("userId"));
+                    user.setUsername(rs.getString("username"));
+                    user.setEmail(rs.getString("email"));
+                    user.setBirthDate(rs.getDate("birthDate").toLocalDate());
+                    user.setGender(UserBean.Gender.valueOf(rs.getString("gender")));
+                    user.setRole(UserBean.Role.valueOf(rs.getString("role")));
+                    user.setCreatedAt(rs.getTimestamp("createdAt").toLocalDateTime());
+                    userList.add(user);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("유저 리스트 가져오기 실패: " + e);
+        }
+        return userList;
+    }
+
+    // 총 유저수 가져오기
+    public int getTotalUsers(String searchKeyword, String joinDate) {
+        String sql = "SELECT COUNT(*) FROM user WHERE role != 'ROOT'";
+
+        if (searchKeyword != null && !searchKeyword.isEmpty()) {
+            sql += " AND (userId LIKE ? OR username LIKE ? OR email LIKE ? OR gender LIKE ?)";
+        }
+
+        if (joinDate != null && !joinDate.isEmpty()) {
+            sql += " AND DATE(createdAt) = ?";
+        }
+
+        try (Connection con = ds.getConnection(); PreparedStatement pstmt = con.prepareStatement(sql)) {
+            int paramIndex = 1;
+
+            if (searchKeyword != null && !searchKeyword.isEmpty()) {
+                pstmt.setString(paramIndex++, "%" + searchKeyword + "%");
+                pstmt.setString(paramIndex++, "%" + searchKeyword + "%");
+                pstmt.setString(paramIndex++, "%" + searchKeyword + "%");
+                pstmt.setString(paramIndex++, "%" + searchKeyword + "%");
+            }
+
+            if (joinDate != null && !joinDate.isEmpty()) {
+                pstmt.setString(paramIndex, joinDate);
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("총 유저 수 가져오기 실패: " + e);
+        }
+        return 0;
+    }
+    
+ // 관리자 권한 변경
+    public boolean changeUserRole(String userId, String newRole) {
+        String sql = "UPDATE user SET role = ? WHERE userId = ?";
+
+        try (Connection con = ds.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setString(1, newRole);
+            pstmt.setString(2, userId);
+            int result = pstmt.executeUpdate();
+            System.out.println("Update result: " + result);
+            return result > 0; // 성공 여부 확인
+        } catch (Exception e) {
+            System.err.println("관리자 변경 실패 : " + e);
+            return false;
+        }
+    }
+
+    // 관리자 여부 확인 메소드
+    public boolean isAdmin(String userId) {
+        String sql = "SELECT role FROM user WHERE userId = ?";
+
+        try (Connection con = ds.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setString(1, userId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return "ADMIN".equals(rs.getString("role"));
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("관리자 여부 확인 실패 : " + e);
+        }
+        return false;
     }
 }

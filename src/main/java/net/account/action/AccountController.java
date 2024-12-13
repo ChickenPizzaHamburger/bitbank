@@ -22,9 +22,7 @@ public class AccountController extends HttpServlet {
 
         switch (command) {
             case "accountView.ac": // 계좌 목록 화면
-                forward = new ActionForward();
-                forward.setRedirect(false);
-                forward.setPath("/account/AccountView.jsp");
+                action = new AccountAction();
                 break;
 
             case "accountInfoView.ac": // 계좌 정보 화면

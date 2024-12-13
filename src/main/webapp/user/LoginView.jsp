@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 부트스트랩 모바일 설정 -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+	<meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Expires" content="0" />
     <title>로그인</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> <!-- 부트스트랩 CSS -->
     <link rel="stylesheet" href="./resources/loginStyle.css"> <!-- CSS 파일 링크 -->
@@ -90,21 +93,36 @@
     <!-- 서버에서 전달된 에러 메시지를 확인하여 Toast 표시 -->
     <script>
 	    document.addEventListener("DOMContentLoaded", () => {
-	        // 서버에서 전달된 errorMessage 값 가져오기
-	        const errorMessage = '<%= (String) request.getAttribute("errorMessage") %>';
-	        
-	        // 에러 메시지가 null이 아니고 비어 있지 않을 때만 Toast 표시
-	        if (errorMessage && errorMessage.trim() !== "") {
-	            const toastBody = document.querySelector('#errorToast .toast-body');
-	            toastBody.textContent = errorMessage; // Toast에 에러 메시지 설정
-	
-	            const toastElement = document.getElementById('errorToast');
-	            const toast = new bootstrap.Toast(toastElement);
-	            toast.show(); // Toast 표시
-	
-	            // 한 번 표시한 뒤 errorMessage를 제거
+	        // 서버에서 전달된 errorMessage
+	        const serverErrorMessage = '<%= request.getSession().getAttribute("errorMessage") != null ? (String) request.getSession().getAttribute("errorMessage") : "" %>';
+
+	        // localStorage에 저장된 errorMessage
+	        const localErrorMessage = localStorage.getItem("loginError");
+
+	        // 두 가지 errorMessage 중 하나라도 있으면 토스트 메시지 표시
+	        const errorMessage = serverErrorMessage || localErrorMessage;
+	        if (errorMessage) {
+	            // 토스트 메시지 표시 함수
+	            const showErrorMessage = (message) => {
+	                const toastElement = document.getElementById('errorToast');
+	                if (toastElement) {
+	                    const toastBody = toastElement.querySelector('.toast-body');
+	                    if (toastBody) {
+	                        toastBody.textContent = message;
+	                        const toast = new bootstrap.Toast(toastElement);
+	                        toast.show();
+	                    }
+	                }
+	            };
+
+	            showErrorMessage(errorMessage);
+
+	            // localStorage에 저장된 errorMessage 삭제
+	            localStorage.removeItem("loginError");
+
+	            // 서버에서 errorMessage 삭제
 	            <%
-	                request.removeAttribute("errorMessage");
+	                request.getSession().removeAttribute("errorMessage");
 	            %>
 	        }
 	    });

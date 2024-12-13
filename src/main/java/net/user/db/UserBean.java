@@ -4,6 +4,9 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 /*
 CREATE TABLE `user` (
@@ -121,6 +124,18 @@ public class UserBean {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+    
+    public String getFormattedCreatedAt() {
+        // 데이터베이스에서 가져온 createdAt을 그대로 사용
+        LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+        LocalDateTime formattedTime = createdAt.minusHours(9);
+        
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 E요일 a hh:mm:ss");
+        String formattedTimeStr = formattedTime.format(formatter);
+        
+        System.out.println("Formatted Created At: " + formattedTimeStr);
+        return formattedTimeStr;
     }
 
     // SQL 타입으로 변환하는 메서드들
